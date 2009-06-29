@@ -1,0 +1,4 @@
+To Do:
+- make dPath and cPath have only the path
+- set cFile and dFile to only the file name
+- figure out how to output data nicely
