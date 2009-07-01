@@ -38,6 +38,9 @@ class ContactInfo
 		void SearchConvert(QString &); //converts a string to all caps
 		QString sFirstName, sLastName; //to store converted QStrings
 
+		friend ostream & operator<< (ostream & output, ContactInfo & aContact);
+		friend istream & operator>> (istream & input, ContactInfo & aContact);
+
 	private:		
 		QString FirstName;
 		QString LastName;
