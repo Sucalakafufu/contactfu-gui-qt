@@ -175,11 +175,11 @@ repeat:
 		strm >> aDay;
 		strm >> aYear;
 		
-		finMonth.fromAscii(aMonth.c_str()); finDay.fromAscii(aMonth.c_str()); finYear.fromAscii(aYear.c_str());
+		finMonth = QString::fromStdString(aMonth); finDay = QString::fromStdString(aDay); finYear = QString::fromStdString(aYear);
 		if (aMonth == "\\0" || aDay == "\\0" || aYear == "\\0")
 		{
 			aMonth = aDay = aYear = "\0";
-			finMonth.fromAscii(aMonth.c_str()); finDay.fromAscii(aMonth.c_str()); finYear.fromAscii(aYear.c_str());
+			finMonth = QString::fromStdString(aMonth); finDay = QString::fromStdString(aDay); finYear = QString::fromStdString(aYear);
 		}
 		else
 		{
@@ -190,7 +190,7 @@ repeat:
 				aMonth = matchMonth->second;
 			}
 		}
-		finMonth.fromAscii(aMonth.c_str()); finDay.fromAscii(aMonth.c_str()); finYear.fromAscii(aYear.c_str());
+		finMonth = QString::fromStdString(aMonth); finDay = QString::fromStdString(aDay); finYear = QString::fromStdString(aYear);
 		if (obj.SetDate(finMonth, finDay, finYear)) //if date was set correctly
 			return strm;
 	}
@@ -204,14 +204,11 @@ repeat:
 		getline(cin, aYear);
 	}
 
-	finMonth.fromAscii(aMonth.c_str());
-	obj.SearchConvert(finMonth);
-	aMonth = qPrintable(finMonth);
+	finMonth = QString::fromStdString(aMonth);
+	obj.SearchConvert(finMonth); aMonth = qPrintable(finMonth);
 	map<string,string>::iterator matchMonth = months.find(aMonth);
 	if (matchMonth != months.end())
-	{
 		aMonth = matchMonth->second;
-	}
 
 	if (obj.SetDate(finMonth, finDay, finYear) && strm == cin) //if user input valid date
 	{

@@ -353,3 +353,65 @@ void ContactInfo::SearchConvert(QString &name)
 {
 	name = name.toUpper();
 }
+
+ostream & operator<< (ostream & output, ContactInfo & aContact)
+{
+	if (output == cout)
+	{
+		if (!aContact.FirstName.isEmpty()) output << "First Name: " << qPrintable(aContact.FirstName);
+		if (!aContact.LastName.isEmpty()) output << "\nLast Name: " << qPrintable(aContact.LastName);
+		if (aContact.FirstName.isEmpty() && aContact.LastName.isEmpty()) output << "Name: Unknown";
+		if (!aContact.Email.isEmpty()) output << "\nEmail: " << qPrintable(aContact.Email);
+		if (!aContact.Phone.isEmpty()) output << "\nPhone: " << qPrintable(aContact.Phone);
+		if (!aContact.Birthday.isEmptyNow()) output << "\nBirthday: " << aContact.Birthday;
+	}
+	else
+	{
+		if (aContact.FirstName.isEmpty()) output << "\\0 "; 
+		else output << qPrintable(aContact.FirstName) << " ";
+		if (aContact.LastName.isEmpty()) output << "\\0 ";
+		else output << qPrintable(aContact.LastName) << " ";
+		if (aContact.Email.isEmpty()) output << "\\0 ";
+		else output << qPrintable(aContact.Email) << " ";
+		if (aContact.Phone.isEmpty()) output << "\\0 ";
+		else output << qPrintable(aContact.Phone) << " ";
+		output << aContact.Birthday << endl;
+	}
+	return output;
+}
+
+istream & operator>> (istream & input, ContactInfo & aContact)
+{
+	string first, last, email, phone;
+	if (input == cin)
+	{
+		cout << "First Name: ";
+		getline(cin, first);
+		aContact.sFirstName = aContact.FirstName = QString::fromStdString(first);
+		cout << "Last Name: ";
+		getline(cin, last);
+		aContact.sLastName = aContact.LastName = QString::fromStdString(last);
+		cout << "Email: ";
+		getline(cin, email);
+		aContact.Email = QString::fromStdString(email);
+		cout << "Phone: ";
+		getline(cin, phone);
+		aContact.Phone = QString::fromStdString(phone);
+		cout << "Birthday\n";
+		cin >> aContact.Birthday;
+		aContact.SearchConvert(aContact.sFirstName); aContact.SearchConvert(aContact.sLastName);
+	}
+	else
+	{
+		input >> first >> last >> email >> phone >> aContact.Birthday;
+		aContact.FirstName=QString::fromStdString(first); aContact.LastName=QString::fromStdString(last);
+		aContact.Email=QString::fromStdString(email); aContact.Phone=QString::fromStdString(phone);
+		if (aContact.FirstName == "\\0") aContact.FirstName = "\0";
+		if (aContact.LastName == "\\0") aContact.LastName = "\0";
+		if (aContact.Email == "\\0") aContact.Email = "\0";
+		if (aContact.Phone == "\\0") aContact.Phone = "\0";
+		aContact.sFirstName = aContact.FirstName; aContact.sLastName = aContact.LastName;
+		aContact.SearchConvert(aContact.sFirstName); aContact.SearchConvert(aContact.sLastName);
+	}
+	return input;
+}
