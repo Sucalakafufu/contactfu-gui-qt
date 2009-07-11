@@ -2,3 +2,4 @@ To Do:
 - (DONE) make dPath and cPath have only the path
 - (DONE) set cFile and dFile to only the file name
 - figure out how to output data nicely
+- compile statically
