@@ -69,7 +69,6 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 		}
 		fin.close(); fin.clear();
 	}
-	string test = qPrintable(contactDB[0].showFirstName());
 	QTextEdit *text = new QTextEdit; text->setParent(workspace); text->setReadOnly(true);
 	text->setText(contactDB[0].showFirstName()+" "+contactDB[0].showLastName()+"\n"+contactDB[0].showEmail()); 
 	text->show();
