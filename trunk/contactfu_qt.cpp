@@ -1,6 +1,7 @@
 #include "contactfu_qt.h"
 #include <windows.h>
 #include <iostream>
+#include <QtGui>
 #include <qfiledialog.h>
 #include <qobject.h>
 #include <qlabel.h> 
@@ -12,6 +13,7 @@
 #include <qworkspace.h>
 #include <qlistview.h>
 #include <qtextedit.h>
+#include <qradiobutton.h>
 
 bool mergeTwoSortedVectors(vector<ContactInfo> &, vector<ContactInfo> &, vector<ContactInfo> &);
 bool mergeSort(vector<ContactInfo> &);
@@ -35,8 +37,8 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this); setWindowTitle(tr("ContactFU Alpha 0.5"));
 	//connect(ui.actionQuit,SIGNAL(triggered()),this,SLOT(close())); //might be needed later
-	QWorkspace *workspace = new QWorkspace(this);
-	setCentralWidget(workspace);
+	/*QWorkspace *workspace = new QWorkspace(this);
+	setCentralWidget(workspace);*/
 	QFile file("ContactFU.cfg");
 	if (!file.exists())
 	{
@@ -69,9 +71,20 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 		}
 		fin.close(); fin.clear();
 	}
-	QTextEdit *text = new QTextEdit; text->setParent(workspace); text->setReadOnly(true);
-	text->setText(contactDB[0].showFirstName()+" "+contactDB[0].showLastName()+"\n"+contactDB[0].showEmail()); 
-	text->show();
+	QBoxLayout *lineup = new QVBoxLayout(ui.contact_frame);
+	vector<QRadioButton*> contactDisplay; contactDisplay.resize(contactDB.size());
+	vector<QLineEdit*> nameContact; nameContact.resize(contactDB.size());
+	for (unsigned int count=0;count<contactDB.size();count++)
+	{
+		contactDisplay[count] = new QRadioButton(this);
+		//contactDisplay[count]->setAccessibleName(); don't need for now
+		connect(contactDisplay[count], SIGNAL(clicked()), this, SLOT(contactClicked()));
+		nameContact[count] = new QLineEdit(this);
+		nameContact[count]->setText(contactDB[count].showFirstName()+" "+contactDB[count].showLastName());
+		nameContact[count]->setReadOnly(true);
+		lineup->addWidget(contactDisplay[count]);
+		lineup->addWidget(nameContact[count]);
+	}
 }
 
 ContactFU_QT::~ContactFU_QT()
