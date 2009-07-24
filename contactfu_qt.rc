@@ -1,4 +1,3 @@
-#include "resource.h"
 #include "afxres.h"
 
 IDI_ICON1 ICON DISCARDABLE "FU-icon.ico"
