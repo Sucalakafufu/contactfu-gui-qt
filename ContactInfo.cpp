@@ -354,6 +354,26 @@ void ContactInfo::SearchConvert(QString &name)
 	name = name.toUpper();
 }
 
+int ContactInfo::nameLength()
+{
+	return FirstName.length()+LastName.length()+1;
+}
+
+QString ContactInfo::showYear()
+{
+	return Birthday.YearIs();
+}
+
+QString ContactInfo::showMonth()
+{
+	return Birthday.MonthIs();
+}
+
+QString ContactInfo::showDay()
+{
+	return Birthday.DayIs();
+}
+
 ostream & operator<< (ostream & output, ContactInfo & aContact)
 {
 	if (output == cout)

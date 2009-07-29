@@ -1,7 +1,6 @@
 #include "contactfu_qt.h"
 #include <windows.h>
-#include <iostream>
-#include <QtGui>
+#include <sstream>
 #include <qfiledialog.h>
 #include <qobject.h>
 #include <qlabel.h> 
@@ -14,6 +13,15 @@
 #include <qlistview.h>
 #include <qtextedit.h>
 #include <qradiobutton.h>
+#include <qlayout.h>
+#include <QVBoxLayout>
+#include <qframe.h>
+#include <qlineedit.h>
+#include <QFormLayout>
+#include <qwidget.h>
+#include <QListWidget>
+#include <QHash>
+#include <qdatetime.h>
 
 bool mergeTwoSortedVectors(vector<ContactInfo> &, vector<ContactInfo> &, vector<ContactInfo> &);
 bool mergeSort(vector<ContactInfo> &);
@@ -29,8 +37,7 @@ QString cPath, cFile, dFile, dPath;
 ifstream fin;
 ofstream fout;
 
-QString buffer;
-QObject *display;
+QHash<QListWidgetItem*,int> hash;
 
 ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
@@ -71,20 +78,14 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 		}
 		fin.close(); fin.clear();
 	}
-	QBoxLayout *lineup = new QVBoxLayout(ui.contact_frame);
-	vector<QRadioButton*> contactDisplay; contactDisplay.resize(contactDB.size());
-	vector<QLineEdit*> nameContact; nameContact.resize(contactDB.size());
+
 	for (unsigned int count=0;count<contactDB.size();count++)
 	{
-		contactDisplay[count] = new QRadioButton(this);
-		//contactDisplay[count]->setAccessibleName(); don't need for now
-		connect(contactDisplay[count], SIGNAL(clicked()), this, SLOT(contactClicked()));
-		nameContact[count] = new QLineEdit(this);
-		nameContact[count]->setText(contactDB[count].showFirstName()+" "+contactDB[count].showLastName());
-		nameContact[count]->setReadOnly(true);
-		lineup->addWidget(contactDisplay[count]);
-		lineup->addWidget(nameContact[count]);
+		QListWidgetItem *item = new QListWidgetItem(contactDB[count].showFirstName()+" "+contactDB[count].showLastName(), ui.listing);
+		hash[item]=count;
 	}
+	ui.listing->setSortingEnabled(true); ui.listing->sortItems(); //sorts names of contacts
+	ContactFU_QT::contactClicked();
 }
 
 ContactFU_QT::~ContactFU_QT()
@@ -95,18 +96,34 @@ void ContactFU_QT::on_actionOpenProject_triggered()
 {
 	QString file_open = QFileDialog::getOpenFileName(this, tr("Open"),QString(), tr("Data Base Files(*.db)\0*.db\0"));
 }
-void ContactFU_QT::on_actionToggleMaxWindow_triggered()
+void ContactFU_QT::on_actionToggleMaxWindow_triggered() //toggles between normal and maximized
 {
 	if (QWidget::isMaximized())
 		QWidget::showNormal();
 	else
 		QWidget::showMaximized();
 }
-void ContactFU_QT::on_actionQuit_triggered()
+void ContactFU_QT::on_actionQuit_triggered() //quits
 {
 	close();
 }
+void ContactFU_QT::on_listing_currentItemChanged() //if selected contact changes
+{
+	ContactFU_QT::contactClicked();
+}
 
+void ContactFU_QT::contactClicked() //displays info of the currently selected contact
+{
+	QListWidgetItem *buffer = ui.listing->currentItem();
+	QDate date;
+	int i=hash[buffer];
+	date.setYMD(contactDB[i].showYear().toInt(),contactDB[i].showMonth().toInt(),contactDB[i].showDay().toInt());
+	ui.Birthday_dateEdit->setDate(date);
+	ui.Fname_lineEdit->setText(contactDB[i].showFirstName());
+	ui.Lname_lineEdit->setText(contactDB[i].showLastName());
+	ui.Email_lineEdit->setText(contactDB[i].showEmail());
+	ui.Phone_lineEdit->setText(contactDB[i].showPhone());
+}
 bool mergeTwoSortedVectors(vector<ContactInfo> &vecA, vector<ContactInfo> &vecB, vector<ContactInfo> &vecC)
 {
 	//variables

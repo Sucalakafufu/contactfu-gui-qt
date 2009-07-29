@@ -16,6 +16,7 @@ class ContactFU_QT : public QMainWindow
 public:
 	ContactFU_QT(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~ContactFU_QT();
+	QString reference;
 
 private:
 	Ui::ContactFU_QTClass ui;
@@ -24,6 +25,10 @@ private slots:
 	void on_actionOpenProject_triggered();
 	void on_actionQuit_triggered();
 	void on_actionToggleMaxWindow_triggered();
+	void on_listing_currentItemChanged();
+
+public slots:
+	void contactClicked();
 };
 
 #endif // CONTACTFU_QT_H

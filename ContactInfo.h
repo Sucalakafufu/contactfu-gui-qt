@@ -34,9 +34,14 @@ class ContactInfo
 		QString showFirstName(), showLastName(), showEmail(), showPhone();
 		bool emptyBday();
 		bool Search(QString); bool SearchName(QString, QString);
+		int nameLength();
 
 		void SearchConvert(QString &); //converts a string to all caps
 		QString sFirstName, sLastName; //to store converted QStrings
+
+		QString showYear();
+		QString showMonth();
+		QString showDay();
 
 		friend ostream & operator<< (ostream & output, ContactInfo & aContact);
 		friend istream & operator>> (istream & input, ContactInfo & aContact);
