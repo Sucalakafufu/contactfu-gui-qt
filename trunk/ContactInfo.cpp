@@ -2,8 +2,8 @@
 
 ContactInfo::ContactInfo()
 {
-	FirstName = sFirstName = "Contact";
-	LastName = sLastName = "FU";
+	FirstName = sFirstName = "New";
+	LastName = sLastName = "Contact";
 	Email = "";
 	Phone = "";
 	Birthday.SetDate("1", "1", "2000");
@@ -22,7 +22,12 @@ ContactInfo::ContactInfo(QString aFirstName, QString aLastName, QString aEmail, 
 
 void ContactInfo::SetContactInfo(QString newFirstName, QString newLastName, QString newEmail, QString newPhone, DateType newBirthday)
 {
-	ContactInfo(newFirstName, newLastName, newEmail, newPhone, newBirthday);
+	FirstName = sFirstName = newFirstName;
+	LastName = sLastName = newLastName;
+	Email = newEmail;
+	Phone = newPhone;
+	Birthday = newBirthday;
+	SearchConvert(sFirstName); SearchConvert(sLastName);
 }
 
 int ContactInfo::CompareFullName(const ContactInfo & aContact)
