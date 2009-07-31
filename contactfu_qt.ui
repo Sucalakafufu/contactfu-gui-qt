@@ -31,18 +31,18 @@
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>256</width>
-         <height>192</height>
+         <width>271</width>
+         <height>321</height>
         </rect>
        </property>
       </widget>
       <widget class="QFrame" name="right">
        <property name="geometry">
         <rect>
-         <x>290</x>
+         <x>310</x>
          <y>0</y>
-         <width>153</width>
-         <height>302</height>
+         <width>231</width>
+         <height>341</height>
         </rect>
        </property>
        <property name="frameShape">
@@ -123,32 +123,6 @@
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
          <widget class="QPushButton" name="saveButton2">
           <property name="text">
            <string>Save Changes</string>
@@ -161,13 +135,26 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>220</y>
-         <width>75</width>
-         <height>23</height>
+         <y>340</y>
+         <width>91</width>
+         <height>31</height>
         </rect>
        </property>
        <property name="text">
         <string>Add Contact</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="deleteContact_button">
+       <property name="geometry">
+        <rect>
+         <x>190</x>
+         <y>340</y>
+         <width>91</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Delete Contact</string>
        </property>
       </widget>
      </widget>
@@ -188,16 +175,17 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionOpenProject"/>
+    <addaction name="actionSave"/>
     <addaction name="actionQuit"/>
    </widget>
-   <widget class="QMenu" name="menuView">
+   <widget class="QMenu" name="menu_Options">
     <property name="title">
-     <string>&amp;View</string>
+     <string>&amp;Options</string>
     </property>
-    <addaction name="actionToggleMaxWindow"/>
+    <addaction name="action_Sorting"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuView"/>
+   <addaction name="menu_Options"/>
   </widget>
   <action name="actionOpenProject">
    <property name="text">
@@ -215,12 +203,17 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionToggleMaxWindow">
+  <action name="actionSave">
    <property name="text">
-    <string>&amp;Maximize\Normal</string>
+    <string>&amp;Save</string>
    </property>
    <property name="shortcut">
-    <string>F12</string>
+    <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="action_Sorting">
+   <property name="text">
+    <string>&amp;Sorting</string>
    </property>
   </action>
  </widget>

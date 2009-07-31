@@ -14,7 +14,7 @@ bool DateType::SetDate(QString newMonth, QString newDay, QString newYear)
 {
 	if (newMonth.isEmpty() || newDay.isEmpty() || newYear.isEmpty())
 	{
-		year = "\0"; month = "\0"; day = "\0";
+		year.clear(); month.clear(); day.clear();
 		return true;
 	}
 	if (IsValidDate(newMonth, newDay, newYear)) //checks to see if date is valid
@@ -178,7 +178,7 @@ repeat:
 		finMonth = QString::fromStdString(aMonth); finDay = QString::fromStdString(aDay); finYear = QString::fromStdString(aYear);
 		if (aMonth == "\\0" || aDay == "\\0" || aYear == "\\0")
 		{
-			aMonth = aDay = aYear = "\0";
+			aMonth.clear(); aDay.clear(); aYear.clear();
 			finMonth = QString::fromStdString(aMonth); finDay = QString::fromStdString(aDay); finYear = QString::fromStdString(aYear);
 		}
 		else
