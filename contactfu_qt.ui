@@ -182,7 +182,7 @@
     <property name="title">
      <string>&amp;Options</string>
     </property>
-    <addaction name="action_Sorting"/>
+    <addaction name="actionSortBy"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menu_Options"/>
@@ -211,9 +211,9 @@
     <string>Ctrl+S</string>
    </property>
   </action>
-  <action name="action_Sorting">
+  <action name="actionSortBy">
    <property name="text">
-    <string>&amp;Sorting</string>
+    <string>&amp;Sort By...</string>
    </property>
   </action>
  </widget>

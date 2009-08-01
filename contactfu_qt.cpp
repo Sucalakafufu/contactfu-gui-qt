@@ -22,6 +22,7 @@
 #include <QListWidget>
 #include <QHash>
 #include <qdatetime.h>
+#include <qmessagebox.h>
 
 //bool mergeTwoSortedVectors(vector<ContactInfo> &, vector<ContactInfo> &, vector<ContactInfo> &);
 //bool mergeSort(vector<ContactInfo> &);
@@ -94,7 +95,7 @@ void ContactFU_QT::on_actionOpenProject_triggered()
 	QString file_open = QFileDialog::getOpenFileName(this, tr("Open"),QString(), tr("Data Base Files(*.db)\0*.db\0"));
 	if (!file_open.isEmpty())
 	{
-		contactDB.clear();
+		contactDB.clear(); cPath = file_open;
 		fin.open(file_open.toStdString().c_str());
 		fin >> numContactInfoRecords;
 		for (int count = 0; count < numContactInfoRecords; count++) //loops for number of contacts specified
@@ -104,7 +105,7 @@ void ContactFU_QT::on_actionOpenProject_triggered()
 		}
 		fin.close(); fin.clear();
 		ui.listing->clear();
-		updateList();
+		updateList(); cFileUpdate();
 	}
 }
 //void ContactFU_QT::on_actionToggleMaxWindow_triggered() //toggles between normal and maximized
@@ -133,11 +134,24 @@ void ContactFU_QT::on_saveButton2_clicked()
 {
 	ContactFU_QT::saveChanges();
 }
-
-void ContactFU_QT::on_action_Sorting_triggered()
+void ContactFU_QT::on_actionSortBy_triggered()
 {
 }
-
+void ContactFU_QT::on_actionSave_triggered()
+{
+	if (cPath.isEmpty())
+		QString file_save = QFileDialog::getSaveFileName(this, tr("Save"),QString(),tr("Data Base Files(*.db)\0*.db\0"));
+	else
+	{
+		fout.open(cPath.toStdString().c_str());
+		fout<<contactDB.size(); fout<<endl<<endl;
+		for (unsigned int count=0;count<contactDB.size();count++)
+			fout<<contactDB[count];
+		fout.close();
+		QString info = "Contacts Saved in "+cFile;
+		QMessageBox::information(this,tr("Save Successful"),info);
+	}
+}
 void ContactFU_QT::updateList()
 {
 	items.clear();
@@ -158,7 +172,7 @@ void ContactFU_QT::updateList()
 		hash.insert(items[count],count);
 	}
 	ui.listing->setSortingEnabled(true); ui.listing->sortItems(); //sorts names of contacts
-	ContactFU_QT::contactClicked();
+	ui.listing->setCurrentRow(0); ContactFU_QT::contactClicked();
 }
 
 void ContactFU_QT::contactClicked() //displays info of the currently selected contact
@@ -187,7 +201,26 @@ void ContactFU_QT::saveChanges()
 	streamer << tempDate.year(); streamer >> tempString; aYear.fromStdString(tempString);
 	aBirthday.SetDate(aMonth,aDay,aYear);
 	contactDB[i].SetContactInfo(ui.Fname_lineEdit->displayText(),ui.Lname_lineEdit->text(),ui.Email_lineEdit->text(),ui.Phone_lineEdit->text(),aBirthday);
-	buffer->setText(contactDB[i].showLastName()+", "+contactDB[i].showFirstName());
+	if (contactDB[i].showLastName().isEmpty())
+	{
+		if (contactDB[i].showFirstName().isEmpty())
+			buffer->setText(tr("Name Unknown"));
+		else
+			buffer->setText(contactDB[i].showLastName());
+	}
+	else if (contactDB[i].showFirstName().isEmpty())
+		buffer->setText(contactDB[i].showLastName());
+	else
+		buffer->setText(contactDB[i].showLastName()+", "+contactDB[i].showFirstName());
+}
+
+void ContactFU_QT::cFileUpdate()
+{
+	for(finding=0;*(cPath.end()-finding)!='.'&&finding<cPath.length();finding++){}
+	foundEnd = finding;
+	for(;*(cPath.end()-finding)!='/'&&finding<cPath.length();finding++){}
+	cFile.resize(finding-foundEnd-1);
+	for(int count=finding-1,index = 0;count>foundEnd;index++,count--) *(cFile.begin()+index)=*(cPath.end()-count);
 }
 
 //bool mergeTwoSortedVectors(vector<ContactInfo> &vecA, vector<ContactInfo> &vecB, vector<ContactInfo> &vecC)
