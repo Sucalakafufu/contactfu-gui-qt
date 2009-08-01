@@ -141,6 +141,10 @@ void DateType::SearchConvert(QString &name)
 
 ostream &operator<<(ostream &strm, DateType &obj)
 { 
+	if (obj.isEmptyNow())
+		strm << "\\0 \\0 \\0";
+	else
+		strm << qPrintable(obj.month) << " " << qPrintable(obj.day) << " " << qPrintable(obj.year);
 	return strm;
 }
 
