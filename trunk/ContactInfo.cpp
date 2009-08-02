@@ -6,7 +6,7 @@ ContactInfo::ContactInfo()
 	LastName = sLastName = "Contact";
 	Email = "";
 	Phone = "";
-	Birthday.SetDate("1", "1", "2000");
+	Birthday.SetDate("", "", "");
 	SearchConvert(sFirstName); SearchConvert(sLastName);
 }
 
@@ -408,7 +408,7 @@ ostream & operator<< (ostream & output, ContactInfo & aContact)
 istream & operator>> (istream & input, ContactInfo & aContact)
 {
 	string first, last, email, phone;
-	if (input == cin)
+	if (input ==cin)
 	{
 		cout << "First Name: ";
 		getline(cin, first);

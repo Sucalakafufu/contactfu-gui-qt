@@ -29,12 +29,16 @@ private slots:
 	void on_listing_currentItemChanged();
 	void on_saveButton1_clicked();
 	void on_saveButton2_clicked();
+	void on_addContactButton_clicked();
+	void on_deleteContactButton_clicked();
 
 public slots:
 	void contactClicked();
 	void saveChanges();
 	void updateList();
 	void cFileUpdate();
+	void itemHashUpdate();
+	void clearInfo();
 };
 
 #endif // CONTACTFU_QT_H
