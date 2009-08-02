@@ -39,7 +39,7 @@ ifstream fin;
 ofstream fout;
 
 QHash<QListWidgetItem*,int> hash;
-QListWidgetItem *buffer; int i=0;
+int i=0;
 vector<QListWidgetItem*> items;
 
 ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
@@ -128,11 +128,13 @@ void ContactFU_QT::on_listing_currentItemChanged() //if selected contact changes
 
 void ContactFU_QT::on_saveButton1_clicked()
 {
-	ContactFU_QT::saveChanges();
+	if (!contactDB.empty())
+		ContactFU_QT::saveChanges();
 }
 void ContactFU_QT::on_saveButton2_clicked()
 {
-	ContactFU_QT::saveChanges();
+	if (!contactDB.empty())
+		ContactFU_QT::saveChanges();
 }
 void ContactFU_QT::on_actionSortBy_triggered()
 {
@@ -152,6 +154,43 @@ void ContactFU_QT::on_actionSave_triggered()
 		QMessageBox::information(this,tr("Save Successful"),info);
 	}
 }
+void ContactFU_QT::on_addContactButton_clicked()
+{
+	ui.Birthday_dateEdit->setEnabled(true);
+	ContactInfo tempContact;
+	contactDB.push_back(tempContact); QListWidgetItem *tempItem = new QListWidgetItem(tr("New Contact"),ui.listing);
+	items.push_back(tempItem); int added = items.size()-1;
+	hash.insert(items[added],added); ui.listing->sortItems();
+	ui.listing->setCurrentItem(items[added]); ContactFU_QT::contactClicked();
+}
+void ContactFU_QT::on_deleteContactButton_clicked()
+{
+	if (!contactDB.empty())
+	{
+		i=hash.value(ui.listing->currentItem());
+		delete items[i]; 
+		items.erase(items.begin()+i);
+		contactDB.erase(contactDB.begin()+i);
+		ContactFU_QT::itemHashUpdate();
+		if (contactDB.empty()) ContactFU_QT::clearInfo();
+	}
+}
+
+void ContactFU_QT::clearInfo()
+{
+	ui.Fname_lineEdit->clear(); ui.Lname_lineEdit->clear(); ui.Email_lineEdit->clear(); ui.Phone_lineEdit->clear();
+	ui.Birthday_dateEdit->setEnabled(false);
+}
+
+void ContactFU_QT::itemHashUpdate()
+{
+	hash.clear();
+	for (unsigned int count=0;count<items.size();count++)
+	{
+		hash.insert(items[count],count);
+	}
+}
+
 void ContactFU_QT::updateList()
 {
 	items.clear();
@@ -177,24 +216,26 @@ void ContactFU_QT::updateList()
 
 void ContactFU_QT::contactClicked() //displays info of the currently selected contact
 {
-	buffer = ui.listing->currentItem();
-	QDate date;
-	i=hash.value(buffer);
-	/*if (contactDB[i].showYear().isEmpty()||contactDB[i].showMonth().isEmpty()||contactDB[i].showDay().isEmpty())
-		date.setDate(1,1,2000);
-	else*/
-	date.setYMD(contactDB[i].showYear().toInt(),contactDB[i].showMonth().toInt(),contactDB[i].showDay().toInt());
-	ui.Birthday_dateEdit->setDate(date);
-	ui.Fname_lineEdit->setText(contactDB[i].showFirstName());
-	ui.Lname_lineEdit->setText(contactDB[i].showLastName());
-	ui.Email_lineEdit->setText(contactDB[i].showEmail());
-	ui.Phone_lineEdit->setText(contactDB[i].showPhone());
+	if (!contactDB.empty())
+	{
+		QDate date;
+		int clicked=hash.value(ui.listing->currentItem());
+		/*if (contactDB[i].showYear().isEmpty()||contactDB[i].showMonth().isEmpty()||contactDB[i].showDay().isEmpty())
+			date.setDate(1,1,2000);
+		else*/
+		date.setYMD(contactDB[clicked].showYear().toInt(),contactDB[clicked].showMonth().toInt(),contactDB[clicked].showDay().toInt());
+		ui.Birthday_dateEdit->setDate(date);
+		ui.Fname_lineEdit->setText(contactDB[clicked].showFirstName());
+		ui.Lname_lineEdit->setText(contactDB[clicked].showLastName());
+		ui.Email_lineEdit->setText(contactDB[clicked].showEmail());
+		ui.Phone_lineEdit->setText(contactDB[clicked].showPhone());
+	}
 }
 
 void ContactFU_QT::saveChanges()
 {
-	buffer = ui.listing->currentItem();
-	i=hash.value(buffer);DateType aBirthday; QString aMonth, aDay, aYear; stringstream streamer; string tempString; QDate tempDate;
+	i=hash.value(ui.listing->currentItem());DateType aBirthday; QString aMonth, aDay, aYear; stringstream streamer; 
+	string tempString; QDate tempDate;
 	tempDate = ui.Birthday_dateEdit->date(); 
 	streamer << tempDate.month(); streamer >> tempString; aMonth.fromStdString(tempString);
 	streamer << tempDate.day(); streamer >> tempString; aDay.fromStdString(tempString);
@@ -204,14 +245,14 @@ void ContactFU_QT::saveChanges()
 	if (contactDB[i].showLastName().isEmpty())
 	{
 		if (contactDB[i].showFirstName().isEmpty())
-			buffer->setText(tr("Name Unknown"));
+			ui.listing->currentItem()->setText(tr("Name Unknown"));
 		else
-			buffer->setText(contactDB[i].showLastName());
+			ui.listing->currentItem()->setText(contactDB[i].showFirstName());
 	}
 	else if (contactDB[i].showFirstName().isEmpty())
-		buffer->setText(contactDB[i].showLastName());
+		ui.listing->currentItem()->setText(contactDB[i].showLastName());
 	else
-		buffer->setText(contactDB[i].showLastName()+", "+contactDB[i].showFirstName());
+		ui.listing->currentItem()->setText(contactDB[i].showLastName()+", "+contactDB[i].showFirstName());
 }
 
 void ContactFU_QT::cFileUpdate()

@@ -131,7 +131,7 @@
         </item>
        </layout>
       </widget>
-      <widget class="QPushButton" name="addContact_button">
+      <widget class="QPushButton" name="addContactButton">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -144,7 +144,7 @@
         <string>Add Contact</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="deleteContact_button">
+      <widget class="QPushButton" name="deleteContactButton">
        <property name="geometry">
         <rect>
          <x>190</x>
