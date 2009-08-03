@@ -23,6 +23,7 @@
 #include <QHash>
 #include <qdatetime.h>
 #include <qmessagebox.h>
+#include <qshortcut.h>
 
 //bool mergeTwoSortedVectors(vector<ContactInfo> &, vector<ContactInfo> &, vector<ContactInfo> &);
 //bool mergeSort(vector<ContactInfo> &);
@@ -47,17 +48,16 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint);
-	setWindowTitle(tr("ContactFU Alpha 0.6"));
-	//connect(ui.actionQuit,SIGNAL(triggered()),this,SLOT(close())); //might be needed later
-	/*QWorkspace *workspace = new QWorkspace(this);
-	setCentralWidget(workspace);*/
+	setWindowTitle(tr("ContactFU Beta 0.5"));
+	ui.addContactButton->setShortcut(Qt::CTRL+Qt::Key_A);
+	ui.deleteContactButton->setShortcut(Qt::Key_Delete);
+	/*ui.saveButton1->setShortcut(Qt::SHIFT+Qt::Key_S);
+	ui.saveButton2->setShortcut(Qt::SHIFT+Qt::Key_S);*/
+
 	QFile file("ContactFU.cfg");
 	if (!file.exists())
 	{
 		file.open(QFile::WriteOnly);
-		QTextStream fout(&file);
-		QDir path; cPath = path.currentPath()+"/";
-		fout << cPath;
 		file.close();
 	}
 	else
@@ -66,24 +66,28 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 		QTextStream check_in(&file);
 		dPath = check_in.readAll();
 		file.close();
-		cPath.resize(dPath.size());		
-		for(finding=0;*(dPath.end()-finding)!='.'&&finding<dPath.length();finding++){}
-		foundEnd = finding;
-		for(;*(dPath.end()-finding)!='/'&&finding<dPath.length();finding++){}
-		dFile.resize(finding-foundEnd-1); cFile.resize(dFile.size());
-		for(int index=0;index<dPath.length();index++) *(cPath.begin()+index)=*(dPath.begin()+index);
-		for(int count=finding-1,index = 0;count>foundEnd;index++,count--) *(dFile.begin()+index)=*(dPath.end()-count);
-		for(int index=0;index<dFile.length();index++) *(cFile.begin()+index)=*(dFile.begin()+index);
-		fin.open(dPath.toStdString().c_str());
-		fin >> numContactInfoRecords;
-		for (int count = 0; count < numContactInfoRecords; count++) //loops for number of contacts specified
+		if (!dPath.isEmpty())
 		{
-			fin >> contact;
-			contactDB.push_back(contact); //stores new contact in DB
+			cPath.resize(dPath.size());		
+			for(finding=0;*(dPath.end()-finding)!='.'&&finding<dPath.length();finding++){}
+			foundEnd = finding;
+			for(;*(dPath.end()-finding)!='/'&&finding<dPath.length();finding++){}
+			dFile.resize(finding-foundEnd-1); cFile.resize(dFile.size());
+			for(int index=0;index<dPath.length();index++) *(cPath.begin()+index)=*(dPath.begin()+index);
+			for(int count=finding-1,index = 0;count>foundEnd;index++,count--) *(dFile.begin()+index)=*(dPath.end()-count);
+			for(int index=0;index<dFile.length();index++) *(cFile.begin()+index)=*(dFile.begin()+index);
+			fin.open(dPath.toStdString().c_str());
+			fin >> numContactInfoRecords;
+			for (int count = 0; count < numContactInfoRecords; count++) //loops for number of contacts specified
+			{
+				fin >> contact;
+				contactDB.push_back(contact); //stores new contact in DB
+			}
+			fin.close(); fin.clear();
+			updateList();
 		}
-		fin.close(); fin.clear();
 	}
-	updateList();
+	
 }
 
 ContactFU_QT::~ContactFU_QT()
@@ -95,7 +99,8 @@ void ContactFU_QT::on_actionOpenProject_triggered()
 	QString file_open = QFileDialog::getOpenFileName(this, tr("Open"),QString(), tr("Data Base Files(*.db)\0*.db\0"));
 	if (!file_open.isEmpty())
 	{
-		contactDB.clear(); cPath = file_open;
+		contactDB.clear(); cPath = file_open; cFileUpdate();
+		dPath=cPath; dFile=cFile; cfgUpdate();
 		fin.open(file_open.toStdString().c_str());
 		fin >> numContactInfoRecords;
 		for (int count = 0; count < numContactInfoRecords; count++) //loops for number of contacts specified
@@ -105,7 +110,37 @@ void ContactFU_QT::on_actionOpenProject_triggered()
 		}
 		fin.close(); fin.clear();
 		ui.listing->clear();
-		updateList(); cFileUpdate();
+		if (contactDB.empty()) clearInfo();
+		else updateList();
+	}
+}
+void ContactFU_QT::on_actionSave_triggered()
+{
+	if (cPath.isEmpty())
+	{
+		QString file_save = QFileDialog::getSaveFileName(this, tr("Save"),QString(),tr("Data Base Files(*.db)\0*.db\0"));
+		if (!file_save.isEmpty())
+		{
+			cPath = file_save; cFileUpdate();
+			dPath = cPath; dFile = cFile; cfgUpdate();
+			fout.open(cPath.toStdString().c_str());
+			fout<<contactDB.size(); fout<<endl<<endl;
+			for (unsigned int count=0;count<contactDB.size();count++)
+				fout<<contactDB[count];
+			fout.close();
+			QString info = "Contacts Saved in "+cFile;
+			QMessageBox::information(this,tr("Save Successful"),info);
+		}
+	}
+	else
+	{
+		fout.open(cPath.toStdString().c_str());
+		fout<<contactDB.size(); fout<<endl<<endl;
+		for (unsigned int count=0;count<contactDB.size();count++)
+			fout<<contactDB[count];
+		fout.close();
+		QString info = "Contacts Saved in "+cFile;
+		QMessageBox::information(this,tr("Save Successful"),info);
 	}
 }
 //void ContactFU_QT::on_actionToggleMaxWindow_triggered() //toggles between normal and maximized
@@ -121,47 +156,27 @@ void ContactFU_QT::on_actionQuit_triggered() //quits
 {
 	close();
 }
+void ContactFU_QT::on_actionSortBy_triggered()
+{
+}
 void ContactFU_QT::on_listing_currentItemChanged() //if selected contact changes
 {
-	ContactFU_QT::contactClicked();
+	contactClicked();
 }
 
 void ContactFU_QT::on_saveButton1_clicked()
 {
 	if (!contactDB.empty())
-		ContactFU_QT::saveChanges();
+		saveChanges();
 }
 void ContactFU_QT::on_saveButton2_clicked()
 {
 	if (!contactDB.empty())
-		ContactFU_QT::saveChanges();
-}
-void ContactFU_QT::on_actionSortBy_triggered()
-{
-}
-void ContactFU_QT::on_actionSave_triggered()
-{
-	if (cPath.isEmpty())
-		QString file_save = QFileDialog::getSaveFileName(this, tr("Save"),QString(),tr("Data Base Files(*.db)\0*.db\0"));
-	else
-	{
-		fout.open(cPath.toStdString().c_str());
-		fout<<contactDB.size(); fout<<endl<<endl;
-		for (unsigned int count=0;count<contactDB.size();count++)
-			fout<<contactDB[count];
-		fout.close();
-		QString info = "Contacts Saved in "+cFile;
-		QMessageBox::information(this,tr("Save Successful"),info);
-	}
+		saveChanges();
 }
 void ContactFU_QT::on_addContactButton_clicked()
 {
-	ui.Birthday_dateEdit->setEnabled(true);
-	ContactInfo tempContact;
-	contactDB.push_back(tempContact); QListWidgetItem *tempItem = new QListWidgetItem(tr("New Contact"),ui.listing);
-	items.push_back(tempItem); int added = items.size()-1;
-	hash.insert(items[added],added); ui.listing->sortItems();
-	ui.listing->setCurrentItem(items[added]); ContactFU_QT::contactClicked();
+	addContact();
 }
 void ContactFU_QT::on_deleteContactButton_clicked()
 {
@@ -171,15 +186,29 @@ void ContactFU_QT::on_deleteContactButton_clicked()
 		delete items[i]; 
 		items.erase(items.begin()+i);
 		contactDB.erase(contactDB.begin()+i);
-		ContactFU_QT::itemHashUpdate();
-		if (contactDB.empty()) ContactFU_QT::clearInfo();
+		itemHashUpdate();
+		if (contactDB.empty()) clearInfo();
 	}
+}
+
+void ContactFU_QT::addContact()
+{
+	ContactInfo tempContact;
+	contactDB.push_back(tempContact); QListWidgetItem *tempItem = new QListWidgetItem(tr("New Contact"),ui.listing);
+	items.push_back(tempItem); int added = items.size()-1;
+	hash.insert(items[added],added); ui.listing->sortItems();
+	ui.listing->setCurrentItem(items[added]); contactClicked();
+}
+
+void ContactFU_QT::cfgUpdate()
+{
+	fout.open("ContactFU.cfg"); fout<<qPrintable(dPath); fout.close();
 }
 
 void ContactFU_QT::clearInfo()
 {
 	ui.Fname_lineEdit->clear(); ui.Lname_lineEdit->clear(); ui.Email_lineEdit->clear(); ui.Phone_lineEdit->clear();
-	ui.Birthday_dateEdit->setEnabled(false);
+	ui.month_lineEdit->clear(); ui.day_lineEdit->clear(); ui.year_lineEdit->clear();
 }
 
 void ContactFU_QT::itemHashUpdate()
@@ -211,36 +240,44 @@ void ContactFU_QT::updateList()
 		hash.insert(items[count],count);
 	}
 	ui.listing->setSortingEnabled(true); ui.listing->sortItems(); //sorts names of contacts
-	ui.listing->setCurrentRow(0); ContactFU_QT::contactClicked();
+	ui.listing->setCurrentRow(0); contactClicked();
 }
 
 void ContactFU_QT::contactClicked() //displays info of the currently selected contact
 {
 	if (!contactDB.empty())
 	{
-		QDate date;
 		int clicked=hash.value(ui.listing->currentItem());
-		/*if (contactDB[i].showYear().isEmpty()||contactDB[i].showMonth().isEmpty()||contactDB[i].showDay().isEmpty())
-			date.setDate(1,1,2000);
-		else*/
-		date.setYMD(contactDB[clicked].showYear().toInt(),contactDB[clicked].showMonth().toInt(),contactDB[clicked].showDay().toInt());
-		ui.Birthday_dateEdit->setDate(date);
 		ui.Fname_lineEdit->setText(contactDB[clicked].showFirstName());
 		ui.Lname_lineEdit->setText(contactDB[clicked].showLastName());
 		ui.Email_lineEdit->setText(contactDB[clicked].showEmail());
 		ui.Phone_lineEdit->setText(contactDB[clicked].showPhone());
+		ui.month_lineEdit->setText(contactDB[clicked].showMonth());
+		ui.day_lineEdit->setText(contactDB[clicked].showDay());
+		ui.year_lineEdit->setText(contactDB[clicked].showYear());
 	}
 }
 
 void ContactFU_QT::saveChanges()
 {
-	i=hash.value(ui.listing->currentItem());DateType aBirthday; QString aMonth, aDay, aYear; stringstream streamer; 
-	string tempString; QDate tempDate;
-	tempDate = ui.Birthday_dateEdit->date(); 
-	streamer << tempDate.month(); streamer >> tempString; aMonth.fromStdString(tempString);
-	streamer << tempDate.day(); streamer >> tempString; aDay.fromStdString(tempString);
-	streamer << tempDate.year(); streamer >> tempString; aYear.fromStdString(tempString);
-	aBirthday.SetDate(aMonth,aDay,aYear);
+	i=hash.value(ui.listing->currentItem());DateType aBirthday;
+	if (!aBirthday.SetDate(ui.month_lineEdit->text(),ui.day_lineEdit->text(),ui.year_lineEdit->text()))
+	{
+		if (aBirthday.datePartEmpty)
+		{
+			QString temp = "Birthday must have full date or no date";
+			QMessageBox::information(this,tr("Syntax Error"),temp);
+			contactClicked();
+			return;
+		}
+		else
+		{
+			QString temp = "Birthday is invalid";
+			QMessageBox::information(this,tr("Syntax Error"),temp);
+			contactClicked();
+			return;
+		}
+	}
 	contactDB[i].SetContactInfo(ui.Fname_lineEdit->displayText(),ui.Lname_lineEdit->text(),ui.Email_lineEdit->text(),ui.Phone_lineEdit->text(),aBirthday);
 	if (contactDB[i].showLastName().isEmpty())
 	{

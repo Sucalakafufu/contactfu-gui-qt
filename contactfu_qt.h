@@ -38,7 +38,9 @@ public slots:
 	void updateList();
 	void cFileUpdate();
 	void itemHashUpdate();
+	void cfgUpdate();
 	void clearInfo();
+	void addContact();
 };
 
 #endif // CONTACTFU_QT_H

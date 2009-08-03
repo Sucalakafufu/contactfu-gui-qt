@@ -7,24 +7,32 @@
 
 DateType::DateType()
 {
-  year = "1"; month = "1"; day = "1";
+  year = ""; month = ""; day = "";
 }
 
 bool DateType::SetDate(QString newMonth, QString newDay, QString newYear)
 {
-	if (newMonth.isEmpty() || newDay.isEmpty() || newYear.isEmpty())
+	if (newMonth.isEmpty()&&newDay.isEmpty()&&newYear.isEmpty())
 	{
-		year.clear(); month.clear(); day.clear();
+		datePartEmpty = false;
+		month = ""; day = ""; year = "";
 		return true;
 	}
-	if (IsValidDate(newMonth, newDay, newYear)) //checks to see if date is valid
+	else if (newMonth.isEmpty() || newDay.isEmpty() || newYear.isEmpty())
 	{
+		datePartEmpty = true;
+		return false;
+	}
+	else if (IsValidDate(newMonth, newDay, newYear)) //checks to see if date is valid
+	{
+		datePartEmpty = false;
 		year = newYear;
 		month = newMonth;
 		day = newDay;
 		return true;
 	}
 	else
+		datePartEmpty = false;
 		return false;
 }
 

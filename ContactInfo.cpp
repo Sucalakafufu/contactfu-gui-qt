@@ -379,6 +379,11 @@ QString ContactInfo::showDay()
 	return Birthday.DayIs();
 }
 
+bool ContactInfo::isDatePartEmpty()
+{
+	return Birthday.datePartEmpty;
+}
+
 ostream & operator<< (ostream & output, ContactInfo & aContact)
 {
 	if (output == cout)
