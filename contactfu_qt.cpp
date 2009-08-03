@@ -47,7 +47,7 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint);
-	setWindowTitle(tr("ContactFU Alpha 0.5"));
+	setWindowTitle(tr("ContactFU Alpha 0.6"));
 	//connect(ui.actionQuit,SIGNAL(triggered()),this,SLOT(close())); //might be needed later
 	/*QWorkspace *workspace = new QWorkspace(this);
 	setCentralWidget(workspace);*/
