@@ -17,7 +17,8 @@ class DateType
   DateType();
   QString YearIs();       
   QString MonthIs();      
-  QString DayIs();        
+  QString DayIs(); 
+  bool datePartEmpty;
   bool SetDate(QString, QString, QString);
   int ComparedTo(DateType aDate);
   bool IsValidDate(QString, QString, QString);

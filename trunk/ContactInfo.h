@@ -35,6 +35,7 @@ class ContactInfo
 		bool emptyBday();
 		bool Search(QString); bool SearchName(QString, QString);
 		int nameLength();
+		bool isDatePartEmpty();
 
 		void SearchConvert(QString &); //converts a string to all caps
 		QString sFirstName, sLastName; //to store converted QStrings
