@@ -1,4 +1,5 @@
 #include "contactfu_qt.h"
+#include "gVars.h"
 #include <windows.h>
 #include <sstream>
 #include <qfiledialog.h>
@@ -29,20 +30,6 @@
 //bool mergeSort(vector<ContactInfo> &);
 //void GrammarCheck(int);
 
-vector<ContactInfo> contactDB;
-ContactInfo contact;
-int numContactInfoRecords=0, finding = 0, foundEnd = 0, fileSize=0, index=0;
-QString aFirstName, aLastName, checkChoice, search;
-DateType dBegin, dEnd;
-QString cPath, cFile, dFile, dPath;
-
-ifstream fin;
-ofstream fout;
-
-QHash<QListWidgetItem*,int> hash;
-int i=0;
-vector<QListWidgetItem*> items;
-
 ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 	: QMainWindow(parent, flags)
 {
@@ -51,6 +38,7 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 	setWindowTitle(tr("ContactFU Beta 0.5"));
 	ui.addContactButton->setShortcut(Qt::CTRL+Qt::Key_A);
 	ui.deleteContactButton->setShortcut(Qt::Key_Delete);
+	settings_window = new Settings(this); 
 	/*ui.saveButton1->setShortcut(Qt::SHIFT+Qt::Key_S);
 	ui.saveButton2->setShortcut(Qt::SHIFT+Qt::Key_S);*/
 
@@ -96,7 +84,7 @@ ContactFU_QT::~ContactFU_QT()
 
 void ContactFU_QT::on_actionOpenProject_triggered()
 {
-	QString file_open = QFileDialog::getOpenFileName(this, tr("Open"),QString(), tr("Data Base Files(*.db)\0*.db\0"));
+	QString file_open = QFileDialog::getOpenFileName(this, tr("Open"),QString(), tr("DataBase Files(*.db)\0*.db\0"));
 	if (!file_open.isEmpty())
 	{
 		contactDB.clear(); cPath = file_open; cFileUpdate();
@@ -118,7 +106,7 @@ void ContactFU_QT::on_actionSave_triggered()
 {
 	if (cPath.isEmpty())
 	{
-		QString file_save = QFileDialog::getSaveFileName(this, tr("Save"),QString(),tr("Data Base Files(*.db)\0*.db\0"));
+		QString file_save = QFileDialog::getSaveFileName(this, tr("Save"),QString(),tr("DataBase Files(*.db)\0*.db\0"));
 		if (!file_save.isEmpty())
 		{
 			cPath = file_save; cFileUpdate();
@@ -158,6 +146,18 @@ void ContactFU_QT::on_actionQuit_triggered() //quits
 }
 void ContactFU_QT::on_actionSortBy_triggered()
 {
+}
+void ContactFU_QT::on_actionSettings_triggered()
+{
+	if (settings_window->isLchecked())
+	{
+		settings_window->openLcheck=true; settings_window->openDcheck=false;
+	}
+	else if (settings_window->isDchecked())
+	{
+		settings_window->openDcheck=true; settings_window->openLcheck=false;
+	}
+	settings_window->show();
 }
 void ContactFU_QT::on_listing_currentItemChanged() //if selected contact changes
 {
