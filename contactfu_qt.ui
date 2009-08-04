@@ -358,7 +358,7 @@ p, li { white-space: pre-wrap; }
      <string>&amp;Options</string>
     </property>
     <addaction name="actionSortBy"/>
-    <addaction name="actionDefaultFileOptions"/>
+    <addaction name="actionSettings"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menu_Options"/>
@@ -392,9 +392,9 @@ p, li { white-space: pre-wrap; }
     <string>&amp;Sort By...</string>
    </property>
   </action>
-  <action name="actionDefaultFileOptions">
+  <action name="actionSettings">
    <property name="text">
-    <string>&amp;Default File Options</string>
+    <string>&amp;Settings</string>
    </property>
   </action>
  </widget>

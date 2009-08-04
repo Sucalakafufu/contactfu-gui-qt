@@ -4,6 +4,10 @@ To Do:
 - (DONE) figure out how to output data nicely
 - (DONE) compile statically
 - (DONE) warn user when the date is not valid
-- make a dialog to change default file settings
+- make a dialog to change settings
+- create a way to organize contacts into groups and save only that group to another file
+- make "Save As..."
 
 - (MINOR) cannot tab into Birthday
+- (MINOR) hide the question mark in settings window
+- (MINOR) make a shortcut for saving changes to info

@@ -8,6 +8,7 @@
 #include <fstream>
 #include "ui_contactfu_qt.h"
 #include "ContactInfo.h"
+#include "settings.h"
 
 class ContactFU_QT : public QMainWindow
 {
@@ -19,6 +20,7 @@ public:
 
 private:
 	Ui::ContactFU_QTClass ui;
+	Settings *settings_window;
 
 private slots:
 	void on_actionOpenProject_triggered();
@@ -26,6 +28,7 @@ private slots:
 	//void on_actionToggleMaxWindow_triggered();
 	void on_actionSortBy_triggered();
 	void on_actionSave_triggered();
+	void on_actionSettings_triggered();
 	void on_listing_currentItemChanged();
 	void on_saveButton1_clicked();
 	void on_saveButton2_clicked();
