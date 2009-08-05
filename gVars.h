@@ -14,7 +14,7 @@ extern ContactInfo contact;
 extern int numContactInfoRecords, finding, foundEnd, fileSize, index;
 extern QString aFirstName, aLastName, checkChoice, search;
 extern DateType dBegin, dEnd;
-extern QString cPath, cFile, dFile, dPath;
+extern QString cPath, cFile, dFile, dPath, dFileSetting;
 
 extern ifstream fin;
 extern ofstream fout;
@@ -22,6 +22,11 @@ extern ofstream fout;
 extern QHash<QListWidgetItem*,int> hash;
 extern int i;
 extern vector<QListWidgetItem*> items;
-extern bool openLastAtStart, openDefaultAtStart;
+extern bool openLastAtStart, openDefaultAtStart, doNothing, cSave, settings_okayPushed;
+
+//gFunctions
+extern void dFileUpdate();
+extern void cFileUpdate();
+extern void cfgUpdate();
 
 #endif

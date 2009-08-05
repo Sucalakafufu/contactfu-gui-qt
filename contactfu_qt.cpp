@@ -35,7 +35,7 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint);
-	setWindowTitle(tr("ContactFU Beta 0.5"));
+	setWindowTitle(tr("ContactFU Beta 0.6"));
 	ui.addContactButton->setShortcut(Qt::CTRL+Qt::Key_A);
 	ui.deleteContactButton->setShortcut(Qt::Key_Delete);
 	settings_window = new Settings(this); 
@@ -47,12 +47,17 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 	{
 		file.open(QFile::WriteOnly);
 		file.close();
+		cfgUpdate();
 	}
 	else
 	{
 		file.open(QIODevice::ReadOnly);
 		QTextStream check_in(&file);
-		dPath = check_in.readAll();
+		dPath = check_in.readLine();
+		openLastAtStart=check_in.readLine().toUInt();
+		openDefaultAtStart=check_in.readLine().toUInt();
+		doNothing=check_in.readLine().toUInt();
+		if (!openDefaultAtStart&&!openLastAtStart&&!doNothing) openLastAtStart=true;
 		file.close();
 		if (!dPath.isEmpty())
 		{
@@ -74,61 +79,35 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 			fin.close(); fin.clear();
 			updateList();
 		}
+		if (contactDB.empty()) dPath.clear();
+		cfgUpdate();
 	}
-	
 }
 
 ContactFU_QT::~ContactFU_QT()
 {
+	this->show(); fileChanged(); close();
 }
 
-void ContactFU_QT::on_actionOpenProject_triggered()
+void ContactFU_QT::on_actionOpen_triggered()
 {
-	QString file_open = QFileDialog::getOpenFileName(this, tr("Open"),QString(), tr("DataBase Files(*.db)\0*.db\0"));
-	if (!file_open.isEmpty())
-	{
-		contactDB.clear(); cPath = file_open; cFileUpdate();
-		dPath=cPath; dFile=cFile; cfgUpdate();
-		fin.open(file_open.toStdString().c_str());
-		fin >> numContactInfoRecords;
-		for (int count = 0; count < numContactInfoRecords; count++) //loops for number of contacts specified
-		{
-			fin >> contact;
-			contactDB.push_back(contact); //stores new contact in DB
-		}
-		fin.close(); fin.clear();
-		ui.listing->clear();
-		if (contactDB.empty()) clearInfo();
-		else updateList();
-	}
+	openFile();
 }
 void ContactFU_QT::on_actionSave_triggered()
 {
-	if (cPath.isEmpty())
+	saveFile();
+}
+void ContactFU_QT::on_actionSaveAs_triggered()
+{
+	saveFileAs();
+}
+void ContactFU_QT::on_actionNew_triggered()
+{
+	fileChanged();
+	ui.listing->clear(); clearInfo(); cFile.clear(); cPath.clear();
+	if (openLastAtStart)
 	{
-		QString file_save = QFileDialog::getSaveFileName(this, tr("Save"),QString(),tr("DataBase Files(*.db)\0*.db\0"));
-		if (!file_save.isEmpty())
-		{
-			cPath = file_save; cFileUpdate();
-			dPath = cPath; dFile = cFile; cfgUpdate();
-			fout.open(cPath.toStdString().c_str());
-			fout<<contactDB.size(); fout<<endl<<endl;
-			for (unsigned int count=0;count<contactDB.size();count++)
-				fout<<contactDB[count];
-			fout.close();
-			QString info = "Contacts Saved in "+cFile;
-			QMessageBox::information(this,tr("Save Successful"),info);
-		}
-	}
-	else
-	{
-		fout.open(cPath.toStdString().c_str());
-		fout<<contactDB.size(); fout<<endl<<endl;
-		for (unsigned int count=0;count<contactDB.size();count++)
-			fout<<contactDB[count];
-		fout.close();
-		QString info = "Contacts Saved in "+cFile;
-		QMessageBox::information(this,tr("Save Successful"),info);
+		dPath=cPath; dFile=cFile; cfgUpdate();
 	}
 }
 //void ContactFU_QT::on_actionToggleMaxWindow_triggered() //toggles between normal and maximized
@@ -142,6 +121,7 @@ void ContactFU_QT::on_actionSave_triggered()
 //}
 void ContactFU_QT::on_actionQuit_triggered() //quits
 {
+	fileChanged();
 	close();
 }
 void ContactFU_QT::on_actionSortBy_triggered()
@@ -149,15 +129,23 @@ void ContactFU_QT::on_actionSortBy_triggered()
 }
 void ContactFU_QT::on_actionSettings_triggered()
 {
-	if (settings_window->isLchecked())
+	settings_okayPushed=false;
+	if (openLastAtStart)
 	{
 		settings_window->openLcheck=true; settings_window->openDcheck=false;
 	}
-	else if (settings_window->isDchecked())
+	else if (openDefaultAtStart)
 	{
 		settings_window->openDcheck=true; settings_window->openLcheck=false;
 	}
-	settings_window->show();
+	else if (doNothing)
+	{
+		settings_window->openDcheck=false; settings_window->openLcheck=false;
+	}
+	settings_window->show(); settings_window->setChecked();  dFileSetting=dFile;
+	if (dFileSetting.isEmpty()) dFileSetting="<None>"; 
+	if (settings_window->isDchecked()) settings_window->setDFileEdit(dFileSetting);
+	else settings_window->setDFileEdit(tr("<None>"));
 }
 void ContactFU_QT::on_listing_currentItemChanged() //if selected contact changes
 {
@@ -182,6 +170,7 @@ void ContactFU_QT::on_deleteContactButton_clicked()
 {
 	if (!contactDB.empty())
 	{
+		cSave=false;
 		i=hash.value(ui.listing->currentItem());
 		delete items[i]; 
 		items.erase(items.begin()+i);
@@ -193,16 +182,12 @@ void ContactFU_QT::on_deleteContactButton_clicked()
 
 void ContactFU_QT::addContact()
 {
+	cSave=false;
 	ContactInfo tempContact;
 	contactDB.push_back(tempContact); QListWidgetItem *tempItem = new QListWidgetItem(tr("New Contact"),ui.listing);
 	items.push_back(tempItem); int added = items.size()-1;
 	hash.insert(items[added],added); ui.listing->sortItems();
 	ui.listing->setCurrentItem(items[added]); contactClicked();
-}
-
-void ContactFU_QT::cfgUpdate()
-{
-	fout.open("ContactFU.cfg"); fout<<qPrintable(dPath); fout.close();
 }
 
 void ContactFU_QT::clearInfo()
@@ -278,6 +263,7 @@ void ContactFU_QT::saveChanges()
 			return;
 		}
 	}
+	cSave=false;
 	contactDB[i].SetContactInfo(ui.Fname_lineEdit->displayText(),ui.Lname_lineEdit->text(),ui.Email_lineEdit->text(),ui.Phone_lineEdit->text(),aBirthday);
 	if (contactDB[i].showLastName().isEmpty())
 	{
@@ -292,146 +278,94 @@ void ContactFU_QT::saveChanges()
 		ui.listing->currentItem()->setText(contactDB[i].showLastName()+", "+contactDB[i].showFirstName());
 }
 
-void ContactFU_QT::cFileUpdate()
+void ContactFU_QT::saveFile()
 {
-	for(finding=0;*(cPath.end()-finding)!='.'&&finding<cPath.length();finding++){}
-	foundEnd = finding;
-	for(;*(cPath.end()-finding)!='/'&&finding<cPath.length();finding++){}
-	cFile.resize(finding-foundEnd-1);
-	for(int count=finding-1,index = 0;count>foundEnd;index++,count--) *(cFile.begin()+index)=*(cPath.end()-count);
+	if (cPath.isEmpty())
+	{
+		QString file_save = QFileDialog::getSaveFileName(this, tr("Save"),QString(),tr("DataBase Files(*.db)\0*.db\0"));
+		if (!file_save.isEmpty())
+		{
+			cPath = file_save; cFileUpdate();
+			if (openLastAtStart)
+			{
+				dPath = cPath; dFile = cFile; cfgUpdate();
+			}
+			fout.open(cPath.toStdString().c_str());
+			fout<<contactDB.size(); fout<<endl<<endl;
+			for (unsigned int count=0;count<contactDB.size();count++)
+				fout<<contactDB[count];
+			fout.close();
+			QString info = "Contacts Saved in "+cFile;
+			QMessageBox::information(this,tr("Save Successful"),info);
+		}
+	}
+	else
+	{
+		fout.open(cPath.toStdString().c_str());
+		fout<<contactDB.size(); fout<<endl<<endl;
+		for (unsigned int count=0;count<contactDB.size();count++)
+			fout<<contactDB[count];
+		fout.close();
+		QString info = "Contacts Saved in "+cFile;
+		QMessageBox::information(this,tr("Save Successful"),info);
+	}
 }
 
-//bool mergeTwoSortedVectors(vector<ContactInfo> &vecA, vector<ContactInfo> &vecB, vector<ContactInfo> &vecC)
-//{
-//	//variables
-//	ContactInfo check;
-//	unsigned int countA, countB, countC;
-//	countA = countB = countC = 0;
-//
-//	if (vecA.size() < 0 || vecB.size() < 0) //if negative amount of contacts
-//	{
-//		system("CLS"); //clear screen
-//		cout << "Could not complete operation due to a negative series.\n";
-//		_getch(); //pauses for user
-//		return false;
-//	}
-//
-//	check = vecA[0];
-//	for (unsigned int count = 0; count < vecA.size(); count++) //makes sure 1st series is sorted
-//	{
-//		if (check > vecA[count]) //if series is not sorted
-//		{
-//			system("CLS"); //clear screen
-//			cout << "A series was not entered in ascending order.";
-//			_getch(); //pauses for user
-//			return false;
-//		}
-//		check = vecA[count];
-//	}
-//
-//	check = vecB[0];
-//	for (unsigned int count = 0; count < vecB.size(); count++) //makes sure 2nd series is sorted
-//	{
-//		if (check > vecB[count]) //if series is not sorted
-//		{
-//			system("CLS"); //clear screen
-//			cout << "A series was not entered in ascending order.";
-//			_getch(); //pause for user
-//			return false;
-//		}
-//		check = vecB[count];
-//	}
-//
-//	while (countC < vecB.size() + vecA.size() && countA < vecA.size() && countB < vecB.size()) //loops while both series aren't merged
-//	{
-//		if (vecA[countA] < vecB[countB])//merges the lower number
-//		{
-//			vecC[countC] = vecA[countA];
-//			countA++; countC++;
-//		}
-//		else
-//		{
-//			vecC[countC] = vecB[countB]; //merges the lower number
-//			countB++; countC++;
-//		}
-//	}
-//
-//	if (countA < vecA.size()) //checks if to see if the 1st series is already merged
-//	{
-//		while (countA < vecA.size()) //merges the rest of the series
-//		{
-//			vecC[countC] = vecA[countA];
-//			countA++; countC++;
-//		}
-//	}
-//	else if (countB < vecB.size()) //checks to see if the 2nd series is already merged
-//	{
-//		while (countB < vecB.size()) //merges the rest of the series
-//		{
-//			vecC[countC] = vecB[countB];
-//			countB++; countC++;
-//		}
-//	}
-//	return true;
-//}
-//
-//bool mergeSort(vector<ContactInfo> &vecToSort)
-//{
-//	//variables
-//	ContactInfo low;
-//	//vectors
-//	vector<ContactInfo> vec1;
-//	vector<ContactInfo> vec2;
-//
-//	if (vecToSort.size() < 0) //if negative amount of numbers
-//	{
-//		system("CLS"); //clear screen
-//		cout << "Could not complete operation due to a negative series.\n";
-//		_getch(); //pause for user
-//		return false;
-//	}
-//	else if (vecToSort.size() <= 1) //series already sorted
-//		return true;
-//	else if (vecToSort.size() == 2) //only 2 numbers
-//	{
-//		if (vecToSort[0] < vecToSort[1] || vecToSort[0] == vecToSort[1]) //check the value of the numbers
-//			return true;
-//		else //switch the numbers if necessary
-//		{
-//			low = vecToSort[1];
-//			vecToSort[1] = vecToSort[0];
-//			vecToSort[0] = low;
-//			return true;
-//		}
-//	}
-//	else //if series is long enough to sort
-//	{
-//		vec1.resize(vecToSort.size()/2); vec2.resize(vecToSort.size() - vecToSort.size()/2); //resize vectors to split main vector in half
-//		for (unsigned int count = 0; count < vecToSort.size()/2; count++) //copy first half to vec1
-//		{
-//			vec1[count] = vecToSort[count];
-//		}
-//		int count2 = 0; //count2 variable for vec2, copy second half to vec2
-//		for (unsigned int count = vecToSort.size() - (vecToSort.size() - vecToSort.size()/2); count < vecToSort.size(); count++)
-//		{
-//			vec2[count2] = vecToSort[count];
-//			count2++;
-//		}
-//
-//		mergeSort(vec1); mergeSort(vec2); //sort both vector halves
-//		mergeTwoSortedVectors(vec1, vec2, vecToSort); //merge into one vector
-//	}
-//	return true;
-//}
-//
-//void GrammarCheck(int integer) //checks grammar
-//{
-//	if (integer == 1 || (integer > 11 && integer % 100 != 11 && integer % 10 == 1) || integer == -1 || (integer < -11 && integer % 100 != -11 && integer % 10 == -1))
-//		cout << "st";
-//	else if (integer == 2 || (integer % 10 == 2 && (integer > 12 || integer < -12)) || integer % 10 == -2)
-//		cout << "nd";
-//	else if (integer == 3 || (integer % 10 == 3 && (integer > 13 || integer < -13)) || integer % 10 == -3)
-//		cout << "rd";
-//	else
-//		cout << "th";
-//}
+void ContactFU_QT::saveFileAs()
+{
+	QString file_save = QFileDialog::getSaveFileName(this, tr("Save"),QString(),tr("DataBase Files(*.db)\0*.db\0"));
+	if (!file_save.isEmpty())
+	{
+		cPath = file_save; cFileUpdate();
+		if (openLastAtStart)
+		{
+			dPath = cPath; dFile = cFile; cfgUpdate();
+		}
+		fout.open(cPath.toStdString().c_str());
+		fout<<contactDB.size(); fout<<endl<<endl;
+		for (unsigned int count=0;count<contactDB.size();count++)
+			fout<<contactDB[count];
+		fout.close();
+		QString info = "Contacts Saved in "+cFile;
+		QMessageBox::information(this,tr("Save Successful"),info);
+	}
+}
+
+void ContactFU_QT::openFile()
+{
+	QString file_open = QFileDialog::getOpenFileName(this, tr("Open"),QString(), tr("DataBase Files(*.db)\0*.db\0"));
+	if (!file_open.isEmpty())
+	{
+		contactDB.clear(); cPath = file_open; cFileUpdate();
+		if (openLastAtStart)
+		{
+			dPath=cPath; dFile=cFile; cfgUpdate();
+		}
+		fin.open(file_open.toStdString().c_str());
+		fin >> numContactInfoRecords;
+		for (int count = 0; count < numContactInfoRecords; count++) //loops for number of contacts specified
+		{
+			fin >> contact;
+			contactDB.push_back(contact); //stores new contact in DB
+		}
+		fin.close(); fin.clear();
+		ui.listing->clear();
+		if (contactDB.empty()) clearInfo();
+		else updateList();
+	}
+}
+
+void ContactFU_QT::fileChanged()
+{
+	if (!cSave)
+	{
+		int answer;
+		if (!cFile.isEmpty())
+			answer = QMessageBox::question(this,tr("ContactFU"),tr("Information in ")+cFile+tr(" has been changed.\n\nWould you like to save the changes?"),tr("&Yes"),tr("&No"));
+		else
+			answer = QMessageBox::question(this,tr("ContactFU"),tr("Information has been changed.\n\nWould you like to save the changes?"),tr("&Yes"),tr("&No"));
+		if (answer == 0)
+			saveFile();
+	}
+	cSave=true;
+}

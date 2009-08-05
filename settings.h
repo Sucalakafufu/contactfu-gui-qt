@@ -15,6 +15,8 @@ public:
 	bool openDcheck, openLcheck;
 	bool isDchecked();
 	bool isLchecked();
+	void setChecked();
+	void setDFileEdit(QString);
 
 private:
 	Ui::settingsDialog ui;
@@ -23,6 +25,7 @@ private:
 private slots:
 	void on_openLastAtStart_checkBox_toggled();
 	void on_openDefaultAtStart_checkBox_toggled();
+	void on_doNothing_checkBox_toggled();
 	void on_dFile_pushButton_clicked();
 	void on_okay_pushButton_clicked();
 	void on_cancel_pushButton_clicked();
