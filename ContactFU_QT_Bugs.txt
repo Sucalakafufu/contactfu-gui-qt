@@ -6,8 +6,9 @@ To Do:
 - (DONE) warn user when the date is not valid
 - (DONE) make a dialog to change settings
 - (DONE) make "Save As..."
+- (DONE) hide the question mark in settings window
 - create a way to organize contacts into groups and save only that group to another file if wanted
+- create nickname storage
 
 - (MINOR) cannot tab into Birthday
-- (MINOR) hide the question mark in settings window
 - (MINOR) choose a shortcut for saving changes to info
