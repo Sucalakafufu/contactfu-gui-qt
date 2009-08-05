@@ -3,6 +3,7 @@
 Settings::Settings(QWidget *parent) : QDialog(parent)
 {
 	ui.setupUi(this); setWindowFlags(Qt::Dialog | Qt::WindowCloseButtonHint);
+	setWindowTitle(tr("Settings"));
 	ui.dFile_lineEdit->setReadOnly(true);
 	openDcheck=ui.openDefaultAtStart_checkBox->isChecked(); openLcheck=ui.openLastAtStart_checkBox->isChecked();
 	if (ui.openLastAtStart_checkBox->isChecked())
