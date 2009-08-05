@@ -104,7 +104,7 @@ void ContactFU_QT::on_actionSaveAs_triggered()
 void ContactFU_QT::on_actionNew_triggered()
 {
 	fileChanged();
-	ui.listing->clear(); clearInfo(); cFile.clear(); cPath.clear();
+	ui.listing->clear(); clearInfo(); cFile.clear(); cPath.clear(); contactDB.clear(); items.clear(); hash.clear();
 	if (openLastAtStart)
 	{
 		dPath=cPath; dFile=cFile; cfgUpdate();
