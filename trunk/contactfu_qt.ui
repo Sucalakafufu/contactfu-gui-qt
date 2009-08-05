@@ -348,8 +348,10 @@ p, li { white-space: pre-wrap; }
     <property name="title">
      <string>&amp;File</string>
     </property>
-    <addaction name="actionOpenProject"/>
+    <addaction name="actionNew"/>
+    <addaction name="actionOpen"/>
     <addaction name="actionSave"/>
+    <addaction name="actionSaveAs"/>
     <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
@@ -363,9 +365,9 @@ p, li { white-space: pre-wrap; }
    <addaction name="menuFile"/>
    <addaction name="menu_Options"/>
   </widget>
-  <action name="actionOpenProject">
+  <action name="actionOpen">
    <property name="text">
-    <string>&amp;Open Project</string>
+    <string>&amp;Open</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
@@ -394,7 +396,23 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="actionSettings">
    <property name="text">
-    <string>&amp;Settings</string>
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionSaveAs">
+   <property name="text">
+    <string>Save As...</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+S</string>
+   </property>
+  </action>
+  <action name="actionNew">
+   <property name="text">
+    <string>&amp;New</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
  </widget>

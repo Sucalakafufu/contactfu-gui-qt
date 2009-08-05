@@ -23,11 +23,13 @@ private:
 	Settings *settings_window;
 
 private slots:
-	void on_actionOpenProject_triggered();
+	void on_actionOpen_triggered();
 	void on_actionQuit_triggered();
 	//void on_actionToggleMaxWindow_triggered();
 	void on_actionSortBy_triggered();
 	void on_actionSave_triggered();
+	void on_actionSaveAs_triggered();
+	void on_actionNew_triggered();
 	void on_actionSettings_triggered();
 	void on_listing_currentItemChanged();
 	void on_saveButton1_clicked();
@@ -39,11 +41,13 @@ public slots:
 	void contactClicked();
 	void saveChanges();
 	void updateList();
-	void cFileUpdate();
 	void itemHashUpdate();
-	void cfgUpdate();
 	void clearInfo();
 	void addContact();
+	void saveFile();
+	void saveFileAs();
+	void openFile();
+	void fileChanged();
 };
 
 #endif // CONTACTFU_QT_H
