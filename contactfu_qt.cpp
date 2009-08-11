@@ -35,7 +35,7 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint);
-	setWindowTitle(tr("ContactFU Beta 0.6"));
+	setWindowTitle(tr("ContactFU Beta 0.6.1"));
 	ui.addContactButton->setShortcut(Qt::CTRL+Qt::Key_A);
 	ui.deleteContactButton->setShortcut(Qt::Key_Delete);
 	settings_window = new Settings(this); 
@@ -297,6 +297,7 @@ void ContactFU_QT::saveFile()
 			fout.close();
 			QString info = "Contacts Saved in "+cFile;
 			QMessageBox::information(this,tr("Save Successful"),info);
+			cSave=true;
 		}
 	}
 	else
@@ -308,12 +309,13 @@ void ContactFU_QT::saveFile()
 		fout.close();
 		QString info = "Contacts Saved in "+cFile;
 		QMessageBox::information(this,tr("Save Successful"),info);
+		cSave=true;
 	}
 }
 
 void ContactFU_QT::saveFileAs()
 {
-	QString file_save = QFileDialog::getSaveFileName(this, tr("Save"),QString(),tr("DataBase Files(*.db)\0*.db\0"));
+	QString file_save = QFileDialog::getSaveFileName(this, tr("Save As..."),QString(),tr("DataBase Files(*.db)\0*.db\0"));
 	if (!file_save.isEmpty())
 	{
 		cPath = file_save; cFileUpdate();
@@ -328,6 +330,7 @@ void ContactFU_QT::saveFileAs()
 		fout.close();
 		QString info = "Contacts Saved in "+cFile;
 		QMessageBox::information(this,tr("Save Successful"),info);
+		cSave=true;
 	}
 }
 
