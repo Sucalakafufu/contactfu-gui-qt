@@ -155,12 +155,16 @@ void ContactFU_QT::on_listing_currentItemChanged() //if selected contact changes
 void ContactFU_QT::on_saveButton1_clicked()
 {
 	if (!contactDB.empty())
-		saveChanges();
+	{
+		saveChanges(); ui.saveButton1->setFocus();
+	}
 }
 void ContactFU_QT::on_saveButton2_clicked()
 {
 	if (!contactDB.empty())
-		saveChanges();
+	{
+		saveChanges(); ui.saveButton2->setFocus();
+	}
 }
 void ContactFU_QT::on_addContactButton_clicked()
 {
