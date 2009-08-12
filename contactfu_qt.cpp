@@ -168,7 +168,7 @@ void ContactFU_QT::on_saveButton2_clicked()
 }
 void ContactFU_QT::on_addContactButton_clicked()
 {
-	addContact();
+	addContact(); ui.Fname_lineEdit->setFocus(); ui.Fname_lineEdit->selectAll();
 }
 void ContactFU_QT::on_deleteContactButton_clicked()
 {
