@@ -35,12 +35,11 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 {
 	ui.setupUi(this);
 	setWindowFlags(Qt::Window | Qt::WindowMinimizeButtonHint);
-	setWindowTitle(tr("ContactFU Beta 0.6.1"));
+	setWindowTitle(tr("ContactFU Beta 0.6.2"));
 	ui.addContactButton->setShortcut(Qt::CTRL+Qt::Key_A);
 	ui.deleteContactButton->setShortcut(Qt::Key_Delete);
 	settings_window = new Settings(this); 
-	/*ui.saveButton1->setShortcut(Qt::SHIFT+Qt::Key_S);
-	ui.saveButton2->setShortcut(Qt::SHIFT+Qt::Key_S);*/
+	ui.saveButton1->setShortcut(Qt::CTRL+Qt::Key_D);
 
 	QFile file("ContactFU.cfg");
 	if (!file.exists())
@@ -77,6 +76,7 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 				contactDB.push_back(contact); //stores new contact in DB
 			}
 			fin.close(); fin.clear();
+			mergeSort(contactDB);
 			updateList();
 		}
 		if (contactDB.empty()) dPath.clear();

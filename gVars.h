@@ -28,5 +28,7 @@ extern bool openLastAtStart, openDefaultAtStart, doNothing, cSave, settings_okay
 extern void dFileUpdate();
 extern void cFileUpdate();
 extern void cfgUpdate();
+extern bool mergeTwoSortedVectors(vector<ContactInfo>&,vector<ContactInfo>&,vector<ContactInfo>&);
+extern bool mergeSort(vector<ContactInfo>&);
 
 #endif
