@@ -38,7 +38,7 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 	setWindowTitle(tr("ContactFU Beta 0.6.2"));
 	ui.addContactButton->setShortcut(Qt::CTRL+Qt::Key_A);
 	ui.deleteContactButton->setShortcut(Qt::Key_Delete);
-	settings_window = new Settings(this); 
+	settings_window = new Settings(this);  settings_window->setFixedSize(274,216); settings_window->setModal(true);
 	ui.saveButton1->setShortcut(Qt::CTRL+Qt::Key_D);
 
 	QFile file("ContactFU.cfg");

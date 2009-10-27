@@ -412,6 +412,9 @@ p, li { white-space: pre-wrap; }
    <property name="text">
     <string>Settings</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+,</string>
+   </property>
   </action>
   <action name="actionSaveAs">
    <property name="text">
