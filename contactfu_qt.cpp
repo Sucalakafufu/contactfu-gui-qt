@@ -85,6 +85,7 @@ ContactFU_QT::ContactFU_QT(QWidget *parent, Qt::WFlags flags)
 }
 
 ContactFU_QT::~ContactFU_QT()
+
 {
 	this->show(); fileChanged(); close();
 }
@@ -103,7 +104,7 @@ void ContactFU_QT::on_actionSaveAs_triggered()
 }
 void ContactFU_QT::on_actionNew_triggered()
 {
-	fileChanged();
+	fileChanged(); cSave = false;
 	ui.listing->clear(); clearInfo(); cFile.clear(); cPath.clear(); contactDB.clear(); items.clear(); hash.clear();
 	if (openLastAtStart)
 	{
